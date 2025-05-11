@@ -12,11 +12,17 @@ interface RecipeTimerProps {
   stepIndex: number;
 }
 
+// Audio URLs using environment variables with fallback to your Vercel Blob URL
 const backgroundTracks: BackgroundTrack[] = [
-  { url: '/assets/Samajavaragamana.mp3', name: 'Samajavaragamana' }
+  { 
+    url: 
+         "https://hoox53krl6prf51l.public.blob.vercel-storage.com/Samajavaragamana-ZPamUPULIB1EF2O7U3OZbn9gZjd2nT.mp3",
+    name: 'Samajavaragamana' 
+  }
 ];
 
-const alarmSound = '/assets/Samajavaragamana.mp3';
+const alarmSound = 
+                  "https://hoox53krl6prf51l.public.blob.vercel-storage.com/Samajavaragamana-ZPamUPULIB1EF2O7U3OZbn9gZjd2nT.mp3";
 
 const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }) => {
   const totalSeconds = minutes * 60 + seconds;
@@ -35,7 +41,7 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
   const musicPositionRef = useRef<number>(0);
   const userInteractedRef = useRef<boolean>(false);
 
-  // Initialize audio elements
+  // Initialize audio elements with Blob URLs
   useEffect(() => {
     try {
       // Alarm sound
@@ -43,15 +49,14 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
       alarmRef.current.preload = 'auto';
       
       // Background music
-      const randomTrack = backgroundTracks[Math.floor(Math.random() * backgroundTracks.length)];
-      setCurrentTrack(randomTrack);
-      bgMusicRef.current = new Audio(randomTrack.url);
+      setCurrentTrack(backgroundTracks[0]);
+      bgMusicRef.current = new Audio(backgroundTracks[0].url);
       bgMusicRef.current.preload = 'auto';
       bgMusicRef.current.loop = true;
       bgMusicRef.current.volume = 0.5;
     } catch (err) {
       console.error("Audio initialization failed:", err);
-      setAudioError("Audio initialization failed");
+      setAudioError("Failed to load audio files");
     }
 
     return () => {
@@ -71,7 +76,7 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
     if (!userInteractedRef.current) {
       userInteractedRef.current = true;
       
-      // Try to play a very short silent audio to unlock the audio context
+      // Try to unlock audio context
       try {
         const silentAudio = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
         silentAudio.volume = 0;
@@ -89,14 +94,19 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
     if (!musicEnabled || !bgMusicRef.current || !audioContextAllowed) return;
     
     try {
+      // Verify audio file exists
+      const res = await fetch(bgMusicRef.current.src, { method: 'HEAD' });
+      if (!res.ok) throw new Error("Audio file not found");
+
       bgMusicRef.current.currentTime = musicPositionRef.current;
       await bgMusicRef.current.play();
       setIsMusicPlaying(true);
       setAudioError(null);
     } catch (err) {
       console.error("Music play failed:", err);
-      setAudioError("Please click the play button to enable audio");
+      setAudioError("Background music unavailable");
       setIsMusicPlaying(false);
+      setMusicEnabled(false); // Auto-disable if fails
     }
   };
 
