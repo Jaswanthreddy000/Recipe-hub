@@ -130,7 +130,7 @@ const Login: React.FC = () => {
             </button>
           </div>
           
-          <div className="text-center">
+          {/* <div className="text-center">
             <button
               type="button"
               onClick={useDemo}
@@ -139,7 +139,7 @@ const Login: React.FC = () => {
             >
               Use demo account
             </button>
-          </div>
+          </div> */}
         </form>
         
         <div className="text-center">
