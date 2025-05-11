@@ -67,10 +67,21 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
     };
   }, []);
 
-  const handleUserInteraction = () => {
+  const handleUserInteraction = async () => {
     if (!userInteractedRef.current) {
       userInteractedRef.current = true;
-      setAudioContextAllowed(true);
+      
+      // Try to play a very short silent audio to unlock the audio context
+      try {
+        const silentAudio = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
+        silentAudio.volume = 0;
+        await silentAudio.play();
+        silentAudio.pause();
+        setAudioContextAllowed(true);
+      } catch (err) {
+        console.log("Silent audio play failed, falling back to regular interaction");
+        setAudioContextAllowed(true);
+      }
     }
   };
 
@@ -84,7 +95,7 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
       setAudioError(null);
     } catch (err) {
       console.error("Music play failed:", err);
-      setAudioError("Click the play button to enable audio");
+      setAudioError("Please click the play button to enable audio");
       setIsMusicPlaying(false);
     }
   };
@@ -106,7 +117,7 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
     } else {
       stopBackgroundMusic();
     }
-  }, [musicEnabled, audioContextAllowed]);
+  }, [musicEnabled, audioContextAllowed, isActive]);
 
   // Handle timer logic
   useEffect(() => {
@@ -139,8 +150,8 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
     };
   }, [isActive, timeLeft, musicEnabled, audioContextAllowed]);
 
-  const toggleTimer = () => {
-    handleUserInteraction();
+  const toggleTimer = async () => {
+    await handleUserInteraction();
     setIsActive(prev => !prev);
     setShowNotification(false);
   };
