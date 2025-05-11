@@ -88,7 +88,7 @@ const mockRecipesList: Recipe[] = [
     createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     cookingTime: 30,
-    servings: 24,
+    servings: 1,
     isPublic: true,
     tags: ['Dessert', 'Cookies', 'Baking'],
     ingredients: [
@@ -243,7 +243,7 @@ const mockRecipesList: Recipe[] = [
     isPublic: true,
     tags: ['Italian', 'Pasta', 'From Scratch'],
     ingredients: [
-      { name: '00 flour or all-purpose flour', quantity: 2, unit: 'cups', altQuantity: 250, altUnit: 'g' },
+      { name: 'flour or all-purpose flour', quantity: 2, unit: 'cups', altQuantity: 250, altUnit: 'g' },
       { name: 'Large eggs', quantity: 3, unit: 'whole', altQuantity: null, altUnit: null },
       { name: 'Salt', quantity: 0.5, unit: 'tsp', altQuantity: null, altUnit: null },
       { name: 'Olive oil', quantity: 1, unit: 'tsp', altQuantity: 5, altUnit: 'ml' },
