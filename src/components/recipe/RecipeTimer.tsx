@@ -12,17 +12,14 @@ interface RecipeTimerProps {
   stepIndex: number;
 }
 
-// Audio URLs using environment variables with fallback to your Vercel Blob URL
 const backgroundTracks: BackgroundTrack[] = [
   { 
-    url: 
-         "https://hoox53krl6prf51l.public.blob.vercel-storage.com/Samajavaragamana-ZPamUPULIB1EF2O7U3OZbn9gZjd2nT.mp3",
+    url: "https://hoox53krl6prf51l.public.blob.vercel-storage.com/Samajavaragamana-song-Jmtcx2poY314dvXQWvttZInON2AnrI.MP3",
     name: 'Samajavaragamana' 
   }
 ];
 
-const alarmSound = 
-                  "https://hoox53krl6prf51l.public.blob.vercel-storage.com/Samajavaragamana-ZPamUPULIB1EF2O7U3OZbn9gZjd2nT.mp3";
+const alarmSound = "https://hoox53krl6prf51l.public.blob.vercel-storage.com/mixkit-morning-clock-alarm-1003-qtAKDZecsk5V7WjAFLq8ykTPiouIkO.wav";
 
 const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }) => {
   const totalSeconds = minutes * 60 + seconds;
@@ -34,21 +31,23 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
   const [currentTrack, setCurrentTrack] = useState<BackgroundTrack | null>(null);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
   const [audioContextAllowed, setAudioContextAllowed] = useState<boolean>(false);
+  const [isAlarmPlaying, setIsAlarmPlaying] = useState<boolean>(false);
 
   const alarmRef = useRef<HTMLAudioElement | null>(null);
   const bgMusicRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<number | null>(null);
   const musicPositionRef = useRef<number>(0);
   const userInteractedRef = useRef<boolean>(false);
+  const alarmTimeoutRef = useRef<number | null>(null);
 
-  // Initialize audio elements with Blob URLs
+  
   useEffect(() => {
     try {
-      // Alarm sound
+    
       alarmRef.current = new Audio(alarmSound);
       alarmRef.current.preload = 'auto';
       
-      // Background music
+   
       setCurrentTrack(backgroundTracks[0]);
       bgMusicRef.current = new Audio(backgroundTracks[0].url);
       bgMusicRef.current.preload = 'auto';
@@ -69,6 +68,7 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
         alarmRef.current = null;
       }
       if (intervalRef.current) clearInterval(intervalRef.current);
+      if (alarmTimeoutRef.current) clearTimeout(alarmTimeoutRef.current);
     };
   }, []);
 
@@ -76,7 +76,6 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
     if (!userInteractedRef.current) {
       userInteractedRef.current = true;
       
-      // Try to unlock audio context
       try {
         const silentAudio = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...');
         silentAudio.volume = 0;
@@ -94,7 +93,6 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
     if (!musicEnabled || !bgMusicRef.current || !audioContextAllowed) return;
     
     try {
-      // Verify audio file exists
       const res = await fetch(bgMusicRef.current.src, { method: 'HEAD' });
       if (!res.ok) throw new Error("Audio file not found");
 
@@ -106,7 +104,7 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
       console.error("Music play failed:", err);
       setAudioError("Background music unavailable");
       setIsMusicPlaying(false);
-      setMusicEnabled(false); // Auto-disable if fails
+      setMusicEnabled(false);
     }
   };
 
@@ -135,35 +133,60 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
       intervalRef.current = window.setInterval(() => {
         setTimeLeft(prev => prev - 1);
       }, 1000);
-    } else if (timeLeft === 0) {
-      // Timer completed
+    } else if (timeLeft === 0 && !showNotification) {
+     
       setIsActive(false);
       setShowNotification(true);
       stopBackgroundMusic();
       
       // Play alarm if enabled
-      if (musicEnabled && audioContextAllowed && alarmRef.current) {
+      if (musicEnabled && audioContextAllowed && alarmRef.current && !isAlarmPlaying) {
+        setIsAlarmPlaying(true);
+        alarmRef.current.currentTime = 0;
         alarmRef.current.play().catch(err => {
           console.error("Alarm play failed:", err);
           setAudioError("Could not play alarm sound");
         });
+        
+        // Stop alarm after 5 seconds
+        alarmTimeoutRef.current = window.setTimeout(() => {
+          if (alarmRef.current) {
+            alarmRef.current.pause();
+            alarmRef.current.currentTime = 0;
+          }
+          setIsAlarmPlaying(false);
+        }, 5000);
       }
-
-      if (intervalRef.current) clearInterval(intervalRef.current);
     } else if (!isActive) {
-      // Timer paused
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isActive, timeLeft, musicEnabled, audioContextAllowed]);
+  }, [isActive, timeLeft, musicEnabled, audioContextAllowed, showNotification, isAlarmPlaying]);
 
   const toggleTimer = async () => {
     await handleUserInteraction();
-    setIsActive(prev => !prev);
+    const willBeActive = !isActive;
+    setIsActive(willBeActive);
     setShowNotification(false);
+    
+    if (!willBeActive && isAlarmPlaying) {
+      stopAlarm();
+    }
+  };
+
+  const stopAlarm = () => {
+    if (alarmRef.current) {
+      alarmRef.current.pause();
+      alarmRef.current.currentTime = 0;
+    }
+    if (alarmTimeoutRef.current) {
+      clearTimeout(alarmTimeoutRef.current);
+      alarmTimeoutRef.current = null;
+    }
+    setIsAlarmPlaying(false);
   };
 
   const resetTimer = () => {
@@ -171,6 +194,9 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
     setTimeLeft(totalSeconds);
     setShowNotification(false);
     musicPositionRef.current = 0;
+    
+    stopAlarm();
+    
     if (bgMusicRef.current) {
       bgMusicRef.current.currentTime = 0;
     }
