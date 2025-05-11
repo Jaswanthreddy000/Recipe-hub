@@ -23,91 +23,105 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
   const [timeLeft, setTimeLeft] = useState<number>(totalSeconds);
   const [isActive, setIsActive] = useState<boolean>(false);
   const [showNotification, setShowNotification] = useState<boolean>(false);
-  const [userInteracted, setUserInteracted] = useState<boolean>(false);
   const [audioError, setAudioError] = useState<string | null>(null);
   const [musicEnabled, setMusicEnabled] = useState<boolean>(true);
   const [currentTrack, setCurrentTrack] = useState<BackgroundTrack | null>(null);
+  const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
+  const [audioContextAllowed, setAudioContextAllowed] = useState<boolean>(false);
 
   const alarmRef = useRef<HTMLAudioElement | null>(null);
   const bgMusicRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<number | null>(null);
   const musicPositionRef = useRef<number>(0);
-  const wasPlayingRef = useRef<boolean>(false);
+  const userInteractedRef = useRef<boolean>(false);
 
-  // Load audio elements on mount
+  // Initialize audio elements
   useEffect(() => {
     try {
+      // Alarm sound
       alarmRef.current = new Audio(alarmSound);
       alarmRef.current.preload = 'auto';
-      alarmRef.current.loop = false;
+      
+      // Background music
+      const randomTrack = backgroundTracks[Math.floor(Math.random() * backgroundTracks.length)];
+      setCurrentTrack(randomTrack);
+      bgMusicRef.current = new Audio(randomTrack.url);
+      bgMusicRef.current.preload = 'auto';
+      bgMusicRef.current.loop = true;
+      bgMusicRef.current.volume = 0.5;
     } catch (err) {
-      console.error("Failed to load alarm sound:", err);
-      setAudioError("Failed to load alarm sound");
+      console.error("Audio initialization failed:", err);
+      setAudioError("Audio initialization failed");
     }
 
     return () => {
-      stopAllAudio();
+      if (bgMusicRef.current) {
+        bgMusicRef.current.pause();
+        bgMusicRef.current = null;
+      }
+      if (alarmRef.current) {
+        alarmRef.current.pause();
+        alarmRef.current = null;
+      }
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, []);
 
-  const stopAllAudio = () => {
+  const handleUserInteraction = () => {
+    if (!userInteractedRef.current) {
+      userInteractedRef.current = true;
+      setAudioContextAllowed(true);
+    }
+  };
+
+  const startBackgroundMusic = async () => {
+    if (!musicEnabled || !bgMusicRef.current || !audioContextAllowed) return;
+    
+    try {
+      bgMusicRef.current.currentTime = musicPositionRef.current;
+      await bgMusicRef.current.play();
+      setIsMusicPlaying(true);
+      setAudioError(null);
+    } catch (err) {
+      console.error("Music play failed:", err);
+      setAudioError("Click the play button to enable audio");
+      setIsMusicPlaying(false);
+    }
+  };
+
+  const stopBackgroundMusic = () => {
     if (bgMusicRef.current) {
       musicPositionRef.current = bgMusicRef.current.currentTime;
       bgMusicRef.current.pause();
-      bgMusicRef.current = null;
-    }
-    if (alarmRef.current) {
-      alarmRef.current.pause();
-      alarmRef.current.currentTime = 0;
+      setIsMusicPlaying(false);
     }
   };
 
-  const startBackgroundMusic = () => {
-    if (!userInteracted || !musicEnabled || bgMusicRef.current) return;
+  // Handle music enable/disable
+  useEffect(() => {
+    if (!audioContextAllowed) return;
 
-    try {
-      const track = currentTrack || backgroundTracks[Math.floor(Math.random() * backgroundTracks.length)];
-      if (!currentTrack) setCurrentTrack(track);
-      
-      bgMusicRef.current = new Audio(track.url);
-      bgMusicRef.current.preload = 'auto';
-      bgMusicRef.current.loop = true;
-      bgMusicRef.current.volume = 0.5;
-      bgMusicRef.current.currentTime = musicPositionRef.current;
-
-      bgMusicRef.current.play().catch(err => {
-        console.error("Music play failed:", err);
-        setAudioError("Could not play background music");
-      });
-    } catch (err) {
-      console.error("Failed to initialize background music:", err);
-      setAudioError("Failed to load background music");
+    if (musicEnabled && isActive) {
+      startBackgroundMusic();
+    } else {
+      stopBackgroundMusic();
     }
-  };
+  }, [musicEnabled, audioContextAllowed]);
 
+  // Handle timer logic
   useEffect(() => {
     if (isActive && timeLeft > 0) {
-      // Start background music if needed
-      startBackgroundMusic();
-
       intervalRef.current = window.setInterval(() => {
         setTimeLeft(prev => prev - 1);
       }, 1000);
-    } else if (isActive && timeLeft === 0) {
+    } else if (timeLeft === 0) {
+      // Timer completed
       setIsActive(false);
       setShowNotification(true);
-
-      // Stop background music
-      if (bgMusicRef.current) {
-        bgMusicRef.current.pause();
-        bgMusicRef.current.currentTime = 0;
-        bgMusicRef.current = null;
-        musicPositionRef.current = 0;
-      }
-
-      // Play final alarm sound if music is enabled
-      if (userInteracted && alarmRef.current && musicEnabled) {
+      stopBackgroundMusic();
+      
+      // Play alarm if enabled
+      if (musicEnabled && audioContextAllowed && alarmRef.current) {
         alarmRef.current.play().catch(err => {
           console.error("Alarm play failed:", err);
           setAudioError("Could not play alarm sound");
@@ -116,74 +130,32 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
 
       if (intervalRef.current) clearInterval(intervalRef.current);
     } else if (!isActive) {
-      // When pausing, just stop the interval but keep music state
+      // Timer paused
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isActive, timeLeft, userInteracted, musicEnabled]);
-
-  const handleUserInteraction = () => {
-    if (!userInteracted) {
-      setUserInteracted(true);
-    }
-  };
+  }, [isActive, timeLeft, musicEnabled, audioContextAllowed]);
 
   const toggleTimer = () => {
     handleUserInteraction();
-    const willBeActive = !isActive;
-    setIsActive(willBeActive);
+    setIsActive(prev => !prev);
     setShowNotification(false);
-
-    if (willBeActive) {
-      // When starting/resuming timer
-      if (musicEnabled) {
-        if (bgMusicRef.current) {
-          // If we have an existing audio element, just play it
-          bgMusicRef.current.currentTime = musicPositionRef.current;
-          bgMusicRef.current.play().catch(err => {
-            console.error("Music play failed:", err);
-            setAudioError("Could not play background music");
-          });
-        } else {
-          // Otherwise start new music
-          startBackgroundMusic();
-        }
-      }
-    } else {
-      // When pausing timer
-      if (bgMusicRef.current) {
-        musicPositionRef.current = bgMusicRef.current.currentTime;
-        bgMusicRef.current.pause();
-      }
-    }
   };
 
   const resetTimer = () => {
-    handleUserInteraction();
     setIsActive(false);
     setTimeLeft(totalSeconds);
     setShowNotification(false);
-    stopAllAudio();
     musicPositionRef.current = 0;
+    if (bgMusicRef.current) {
+      bgMusicRef.current.currentTime = 0;
+    }
   };
 
   const toggleMusic = () => {
-    if (musicEnabled) {
-      // Disabling music - save current position
-      if (bgMusicRef.current) {
-        musicPositionRef.current = bgMusicRef.current.currentTime;
-        bgMusicRef.current.pause();
-        bgMusicRef.current = null;
-      }
-    } else {
-      // Enabling music - restore position
-      if (isActive) {
-        startBackgroundMusic();
-      }
-    }
     setMusicEnabled(prev => !prev);
   };
 
@@ -196,7 +168,10 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
   const progress = (timeLeft / totalSeconds) * 100;
 
   return (
-    <div className="bg-amber-50 rounded-lg p-3">
+    <div 
+      className="bg-amber-50 rounded-lg p-3"
+      onClick={handleUserInteraction}
+    >
       <div className={`flex items-center ${showNotification ? 'animate-pulse' : ''}`}>
         <div className="flex-grow">
           <div className="flex items-center space-x-2 mb-1">
@@ -209,7 +184,7 @@ const RecipeTimer: React.FC<RecipeTimerProps> = ({ minutes, seconds, stepIndex }
           </div>
           <div className="text-xl font-mono">{formatTime(timeLeft)}</div>
           
-          {musicEnabled && bgMusicRef.current && currentTrack && (
+          {musicEnabled && isMusicPlaying && currentTrack && (
             <div className="text-xs text-gray-500 mt-1">
               Now playing: {currentTrack.name}
             </div>
