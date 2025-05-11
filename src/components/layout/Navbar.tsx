@@ -75,39 +75,13 @@ const Navbar: React.FC = () => {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <>
-                {/* <Link 
-                  to="/create" 
-                  className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-md flex items-center space-x-1 transition-colors duration-200"
-                >
-                  <PlusCircle className="h-4 w-4" />
-                  <span>New Recipe</span>
-                </Link> */}
-                {/* <div className="relative group">
-                  <button className="flex items-center space-x-2 text-gray-700 hover:text-amber-600">
-                    <User className="h-5 w-5" />
-                    <span className="font-medium">{user.name}</span>
-                  </button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 hidden group-hover:block">
-                    <Link 
-                      to="/profile" 
-                      className="block px-4 py-2 text-gray-700 hover:bg-amber-50 hover:text-amber-700"
-                    >
-                      Profile
-                    </Link>
-                    <button 
-                      onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-amber-50 hover:text-amber-700"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                </div> */}
-                <div className="relative group">
-                <div className="flex items-center space-x-2 text-gray-700 hover:text-amber-600">
+              
+              <div className="relative group">
+                <div className="flex items-center space-x-2 text-gray-700 hover:text-amber-600 cursor-pointer">
                   <User className="h-5 w-5" />
                   <span className="font-medium">{user.name}</span>
                 </div>
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 opacity-0 group-hover:opacity-100 group-hover:visible invisible transition-opacity duration-200">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 delay-100">
                   <Link 
                     to="/profile" 
                     className="block px-4 py-2 text-gray-700 hover:bg-amber-50 hover:text-amber-700"
