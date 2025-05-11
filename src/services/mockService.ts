@@ -1,8 +1,7 @@
-// This file contains mock data and service functions to simulate a backend
 
 import { v4 as uuidv4 } from 'uuid';
 
-// Types
+
 export interface User {
   id: string;
   name: string;
@@ -57,9 +56,9 @@ export interface Invite {
 const mockUsers: User[] = [
   {
     id: '1',
-    name: 'Demo User',
+    name: 'Chef John',
     email: 'demo@example.com',
-    profileImage: 'https://images.pexels.com/photos/1858175/pexels-photo-1858175.jpeg',
+    profileImage: 'https://www.istockphoto.com/photo/woman-hands-decorating-table-with-christmas-holiday-treats-gm2159630258-580207150',
     bio: 'Food enthusiast and home cook.'
   },
   {
@@ -330,10 +329,10 @@ let invites: Invite[] = [
   }
 ];
 
-// Auth Services
+
 export const mockAuth = {
   login: async (email: string, password: string): Promise<User> => {
-    // Simulating API call
+
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     const user = users.find(u => u.email === email);
@@ -345,7 +344,7 @@ export const mockAuth = {
   },
   
   register: async (name: string, email: string, password: string): Promise<User> => {
-    // Simulating API call
+
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     if (users.some(u => u.email === email)) {
@@ -365,7 +364,7 @@ export const mockAuth = {
   },
   
   updateProfile: async (userId: string, userData: Partial<User>): Promise<User> => {
-    // Simulating API call
+  
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     const index = users.findIndex(u => u.id === userId);
@@ -375,7 +374,7 @@ export const mockAuth = {
     
     users[index] = { ...users[index], ...userData };
     
-    // Also update user references in recipes
+   
     recipes = recipes.map(recipe => {
       if (recipe.authorId === userId) {
         return { ...recipe, author: { ...users[index] } };
@@ -397,16 +396,16 @@ export const mockAuth = {
   }
 };
 
-// Recipe Services
+
 export const mockRecipes = {
   getAllRecipes: async (): Promise<Recipe[]> => {
-    // Simulating API call
+  
     await new Promise(resolve => setTimeout(resolve, 500));
     return recipes;
   },
   
   getRecipeById: async (id: string): Promise<Recipe> => {
-    // Simulating API call
+
     await new Promise(resolve => setTimeout(resolve, 300));
     
     const recipe = recipes.find(r => r.id === id);
@@ -418,7 +417,7 @@ export const mockRecipes = {
   },
   
   createRecipe: async (recipeData: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>): Promise<Recipe> => {
-    // Simulating API call
+   
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     const newRecipe: Recipe = {
@@ -434,7 +433,7 @@ export const mockRecipes = {
   },
   
   updateRecipe: async (id: string, recipeData: Partial<Recipe>): Promise<Recipe> => {
-    // Simulating API call
+    
     await new Promise(resolve => setTimeout(resolve, 800));
     
     const index = recipes.findIndex(r => r.id === id);
@@ -452,7 +451,7 @@ export const mockRecipes = {
   },
   
   deleteRecipe: async (id: string): Promise<void> => {
-    // Simulating API call
+   
     await new Promise(resolve => setTimeout(resolve, 500));
     
     const index = recipes.findIndex(r => r.id === id);
@@ -462,12 +461,12 @@ export const mockRecipes = {
     
     recipes.splice(index, 1);
     
-    // Also remove any invites for this recipe
+   
     invites = invites.filter(invite => invite.recipeId !== id);
   },
   
   inviteCollaborator: async (recipeId: string, email: string, inviterId: string): Promise<void> => {
-    // Simulating API call
+   
     await new Promise(resolve => setTimeout(resolve, 800));
     
     const recipe = recipes.find(r => r.id === recipeId);
@@ -485,12 +484,12 @@ export const mockRecipes = {
       throw new Error('User not found with this email');
     }
     
-    // Check if user is already a collaborator
+   
     if (recipe.collaborators?.some(c => c.id === invitee.id)) {
       throw new Error('User is already a collaborator on this recipe');
     }
     
-    // Check if invite already exists
+   
     if (invites.some(i => i.recipeId === recipeId && i.inviteeId === invitee.id)) {
       throw new Error('Invitation already sent to this user');
     }
@@ -509,17 +508,17 @@ export const mockRecipes = {
   }
 };
 
-// Invitation Services
+
 export const mockInvites = {
   getInvitesByUserId: async (userId: string): Promise<Invite[]> => {
-    // Simulating API call
+   
     await new Promise(resolve => setTimeout(resolve, 500));
     
     return invites.filter(invite => invite.inviteeId === userId);
   },
   
   acceptInvite: async (inviteId: string): Promise<void> => {
-    // Simulating API call
+  
     await new Promise(resolve => setTimeout(resolve, 800));
     
     const index = invites.findIndex(i => i.id === inviteId);
@@ -529,19 +528,19 @@ export const mockInvites = {
     
     const invite = invites[index];
     
-    // Find the recipe
+    
     const recipeIndex = recipes.findIndex(r => r.id === invite.recipeId);
     if (recipeIndex === -1) {
       throw new Error('Recipe not found');
     }
     
-    // Find the user
+    
     const user = users.find(u => u.id === invite.inviteeId);
     if (!user) {
       throw new Error('User not found');
     }
     
-    // Add user as collaborator
+
     const collaborators = recipes[recipeIndex].collaborators || [];
     if (!collaborators.some(c => c.id === user.id)) {
       recipes[recipeIndex] = {
@@ -550,12 +549,12 @@ export const mockInvites = {
       };
     }
     
-    // Remove the invite
+   
     invites.splice(index, 1);
   },
   
   declineInvite: async (inviteId: string): Promise<void> => {
-    // Simulating API call
+   
     await new Promise(resolve => setTimeout(resolve, 500));
     
     const index = invites.findIndex(i => i.id === inviteId);
@@ -563,7 +562,7 @@ export const mockInvites = {
       throw new Error('Invitation not found');
     }
     
-    // Remove the invite
+   
     invites.splice(index, 1);
   }
 };
