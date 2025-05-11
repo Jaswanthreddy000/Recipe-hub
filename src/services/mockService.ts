@@ -56,9 +56,9 @@ export interface Invite {
 const mockUsers: User[] = [
   {
     id: '1',
-    name: 'Chef John',
+    name: 'Chef Jennifer',
     email: 'demo@example.com',
-    profileImage: 'https://www.istockphoto.com/photo/woman-hands-decorating-table-with-christmas-holiday-treats-gm2159630258-580207150',
+    profileImage: 'https://images.pexels.com/photos/3893669/pexels-photo-3893669.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     bio: 'Food enthusiast and home cook.'
   },
   {
