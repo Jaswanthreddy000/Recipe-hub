@@ -75,13 +75,13 @@ const Navbar: React.FC = () => {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <>
-                <Link 
+                {/* <Link 
                   to="/create" 
                   className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-md flex items-center space-x-1 transition-colors duration-200"
                 >
                   <PlusCircle className="h-4 w-4" />
                   <span>New Recipe</span>
-                </Link>
+                </Link> */}
                 {/* <div className="relative group">
                   <button className="flex items-center space-x-2 text-gray-700 hover:text-amber-600">
                     <User className="h-5 w-5" />
@@ -191,7 +191,7 @@ const Navbar: React.FC = () => {
                     )}
                   </div>
                 </NavLink>
-                <NavLink 
+                {/* <NavLink 
                   to="/create" 
                   onClick={closeMenu}
                   className={({ isActive }) => 
@@ -202,7 +202,7 @@ const Navbar: React.FC = () => {
                     <PlusCircle className="h-5 w-5" />
                     <span>New Recipe</span>
                   </div>
-                </NavLink>
+                </NavLink> */}
                 <NavLink 
                   to="/profile" 
                   onClick={closeMenu}
