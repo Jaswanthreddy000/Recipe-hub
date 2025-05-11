@@ -50,42 +50,43 @@ const Home: React.FC = () => {
       <div className="py-8">
         <h2 className="text-2xl font-bold text-center mb-12 text-amber-800">Why Use RecipeHub?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="bg-white p-6 rounded-xl shadow-md text-center">
-            <div className="bg-amber-100 text-amber-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Users className="h-8 w-8" />
-            </div>
-            <h3 className="text-xl font-semibold mb-2 text-amber-800">Collaborate</h3>
-            <p className="text-gray-600">
-              Work together in real-time with friends, family, or colleagues to perfect your recipes.
-            </p>
+        <div className="bg-amber-600 p-6 rounded-xl shadow-md text-center">
+          <div className="bg-white text-amber-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Users className="h-8 w-8" />
           </div>
-          
-          <div className="bg-white p-6 rounded-xl shadow-md text-center">
-            <div className="bg-amber-100 text-amber-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Scale className="h-8 w-8" />
-            </div>
-            <h3 className="text-xl font-semibold mb-2 text-amber-800">Scale Recipes</h3>
-            <p className="text-gray-600">
-              Automatically adjust ingredient quantities for any number of servings.
-            </p>
+          <h3 className="text-xl font-semibold mb-2 text-white">Collaborate</h3>
+          <p className="text-white">
+            Work together in real-time with friends, family, or colleagues to perfect your recipes.
+          </p>
+        </div>
+
+        <div className="bg-amber-600 p-6 rounded-xl shadow-md text-center">
+          <div className="bg-white text-amber-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Scale className="h-8 w-8" />
           </div>
-          
-          <div className="bg-white p-6 rounded-xl shadow-md text-center">
-            <div className="bg-amber-100 text-amber-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Timer className="h-8 w-8" />
-            </div>
-            <h3 className="text-xl font-semibold mb-2 text-amber-800">Built-in Timers</h3>
-            <p className="text-gray-600">
-              Add timers to each step for precise cooking instructions and timing.
-            </p>
+          <h3 className="text-xl font-semibold mb-2 text-white">Scale Recipes</h3>
+          <p className="text-white">
+            Automatically adjust ingredient quantities for any number of servings.
+          </p>
+        </div>
+
+        <div className="bg-amber-600 p-6 rounded-xl shadow-md text-center">
+          <div className="bg-white text-amber-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Timer className="h-8 w-8" />
           </div>
+          <h3 className="text-xl font-semibold mb-2 text-white">Built-in Timers</h3>
+          <p className="text-white">
+            Add timers to each step for precise cooking instructions and timing.
+          </p>
+        </div>
+
           
-          <div className="bg-white p-6 rounded-xl shadow-md text-center">
-            <div className="bg-amber-100 text-amber-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="bg-amber-600 p-6 rounded-xl shadow-md text-center">
+            <div className="bg-white text-amber-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <ChefHat className="h-8 w-8" />
             </div>
-            <h3 className="text-xl font-semibold mb-2 text-amber-800">Credit System</h3>
-            <p className="text-gray-600">
+            <h3 className="text-xl font-semibold mb-2 text-white">Credit System</h3>
+            <p className="text-white">
               Original creators are always credited, even as recipes evolve through collaboration.
             </p>
           </div>

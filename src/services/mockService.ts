@@ -82,7 +82,7 @@ const mockRecipesList: Recipe[] = [
     id: '1',
     title: 'Classic Chocolate Chip Cookies',
     description: 'The perfect chocolate chip cookies that are crispy on the outside, chewy on the inside.',
-    image: 'https://images.pexels.com/photos/3028208/pexels-photo-3028208.jpeg',
+    image: 'https://images.pexels.com/photos/5656745/pexels-photo-5656745.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     authorId: '1',
     author: mockUsers[0],
     createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
