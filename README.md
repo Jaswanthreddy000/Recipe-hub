@@ -2,7 +2,9 @@
 
 > 🧑‍🍳 GitHub for Recipes: Co-Author, Scale, Timer, and Share with Seamless Invites!
 
-[🌐 Live Site Vercel Link](https://recipe-hub-opal.vercel.app/) | [🎥 YouTube Walkthrough Video link ](https://your-youtube-video-link.com)
+## [🌐 Live Site Vercel Link](https://recipe-hub-opal.vercel.app/) 
+
+## [🎥 YouTube Walkthrough Video link ](https://www.youtube.com/watch?v=SOUaHbKySXQ)
 
 ---
 
